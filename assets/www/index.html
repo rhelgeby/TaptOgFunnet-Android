@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      
+      <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+      <title>Tapt og Funnet</title>
+      <link rel="stylesheet" href="jquery.mobile-1.0.1.css" />
+      <script src="jquery.js"></script>
+      <script src="jquery.mobile-1.0.1.js"></script>
+      <script type="text/javascript" charset="utf-8" src="cordova-1.6.0.js"></script>
+      
+      <script type="text/javascript" charset="utf-8" src="app.js"></script>
+  </head>
+	
+  <body onload="onLoad();">
+    <div data-role="page" id="home">
+        
+      <div data-role="header">
+          <h1>Tapt og Funnet</h1>
+      </div>
+        
+       <ul data-role="listview">
+         <li><a href="#headset">Beats Øreplugger - løkka</a></li>
+         <li><a href="#">Eksempel 2</a></li>
+         <li><a href="#">Eksempel 3</a></li>
+         <li><a href="#">Eksempel 4</a></li>
+         <li><a href="#">Eksempel 5</a></li>
+         <li><a href="#">Eksempel 6</a></li>
+         <li><a href="#">Eksempel 7</a></li>
+         <li><a href="#">Eksempel 8</a></li>
+      </ul>
+      
+      <div data-role="footer" data-position="fixed">
+          <div data-role="navbar">
+              <ul>
+                  <li><a href="#mistet" data-icon="minus">Mistet</a></li>
+                  <li><a href="#funnet" data-icon="plus">Funnet</a></li>
+                  <li><a href="#varsling" data-icon="alert">Varsling</a></li>
+              </ul>
+          </div>
+      </div>
+        
+    </div>
+    <div data-role="page" id="mistet" data-add-back-btn="true">
+        <div data-role="header">
+            <h1>Mistet</h1>
+        </div>
+
+        <h1>Hvor mistet du gjenstanden?</h1>
+        
+        <ul data-role="listview">
+            <li><a href="#oslo">Oslo<span class="ui-li-count ui-btn-up-c ui-btn-corner-all">3</span></a></li>
+            <li><a href="#">Eksempel 2</a></li>
+            <li><a href="#">Eksempel 3</a></li>
+            <li><a href="#">Eksempel 4</a></li>
+            <li><a href="#">Eksempel 5</a></li>
+            <li><a href="#">Eksempel 6</a></li>
+            <li><a href="#">Eksempel 7</a></li>
+            <li><a href="#">Eksempel 8</a></li>
+        </ul>
+    </div>
+      
+    <div data-role="page" id="oslo" data-add-back-btn="true">
+        <div data-role="header">
+            <h1>Oslo</h1>
+            <input type="search" name="search" id="searc-basic" value="Søk etter gjenstand" />
+        </div>
+        
+        <h1>Siste funn i Oslo</h1>
+        
+        <ul data-role="listview">
+            <li><a href="#headset">Beats Øreplugger - løkka</a></li>
+            <li><a href="#">Eksempel 2</a></li>
+            <li><a href="#">Eksempel 3</a></li>
+        </ul>
+        
+    </div>
+      
+    <div data-role="page" id="headset" data-add-back-btn="true">
+        <div data-role="header">
+              <h1>Oslo</h1>
+        </div>
+
+        <div data-role="content">
+  
+            <h1>Beats Øreplugger - løkka</h1>
+            <img src="Monster_Beats_inear_headphones_99.jpg" alt="Bildet kan ikke vises" width="200px" height="180px"/>
+        
+            <h2>Beskrivelse</h2>
+            <p>Fant et par Beats Øreplugger utenfor Subway på løkka, ene gummiflappen mangler på venster plugg, ellers i fin stand</p>
+        
+            <h2>Kontaktinfo</h2>
+        
+            <a href="tel:40609042">Ring finneren</a>
+            <br>
+            <a href="sms:40609042">SMS til finneren</a>
+            <br>
+            <a href="mailto:jorchr09@nith.no">Mail finneren</a>
+        
+            <h2>Hvor gjenstanden ble funnet</h2>
+            
+        </div>
+    </div>
+      
+    <div data-role="page" id="funnet" data-add-back-btn="true">
+          <div data-role="header">
+              <h1>Funnet gjenstand</h1>
+          </div>
+          
+          <div data-role="content">
+            <label for="select-choice-1" class="select">Hvor ble gjenstanden funnet?</label>
+            <select name="select-choice-1" id="select-choice-1">
+                <option value="oslo">Oslo</option>
+                <option value="vestfold">Vestfold</option>
+                <option value="buskerud">Buskerud</option>
+                <option value="sognogfjordane">Sogn og Fjordane</option>
+                <option value="møreogromsdal">Møre og Romsdal</option>
+                <option value="østfold">Østfold</option>
+                <option value="finnmark">Finnmark</option>
+                <option value="nordtrøndelag">Nord-Trøndelag</option>
+                <option value="sørtrøndelag">Sør-Trøndelag</option>
+                <option value="akershus">Akershus</option>
+                <option value="oppland">Oppland</option>
+                <option value="hedmark">Hedmark</option>
+                <option value="austagder">Aust-Agder</option>
+                <option value="vestagder">Vest-Agder</option>
+                <option value="telemark">Telemark</option>
+                <option value="rogaland">Rogaland</option>
+                <option value="nordland">Nordland</option>
+                <option value="troms">Troms</option>
+                <option value="hordaland">Hordaland</option>
+            </select><br>
+              
+            <input type="text" name="txt" id="txtarea" value="Navn på gjenstanden" /><br>
+
+            <button onclick="capturePhoto();">Ta et bilde av gjenstanden</button> <br>
+            <img style="display:none;width:60px;height:60px;" id="smallImage" src="" /><br>
+              
+            <textarea cols="40" rows="8" name="textarea" id="textarea">Beskrivelse av gjenstanden, og hvor den ble funnet.</textarea><br>
+              
+            <input type="text" name="txt" id="txtarea" value="Ditt telefonnummer" />
+            <input type="text" name="txt" id="txtarea" value="Ditt mobilnummer" />
+            <input type="text" name="txt" id="txtarea" value="Din e-mail" /><br>
+              
+            <fieldset data-role="controlgroup">
+                <legend>Huk av for de måtene du vil bli kontaktet på:</legend>
+                <input type="checkbox" name="checkbox-1" id="checkbox-1" class="custom" />
+                <input type="checkbox" name="checkbox-2" id="checkbox-2" class="custom" />
+                <input type="checkbox" name="checkbox-3" id="checkbox-3" class="custom" />
+                <label for="checkbox-1">E-mail</label>
+                <label for="checkbox-2">SMS</label>
+                <label for="checkbox-3">Telefon</label>
+            </fieldset>
+              
+            <p id="geolocation">Finding geolocation...</p>
+              
+          </div>
+    </div>
+
+      <div data-role="page" id="varsling" data-add-back-btn="true">
+          
+          <div data-role="header">
+              <h1>Eksempel på Varsling</h1>
+          </div>
+          
+          <div data-role="content">
+              <p><a href="#" onclick="showAlert(); return false;">Show Alert</a></p>
+              <p><a href="#" onclick="playBeep(); return false;">Play Beep</a></p>
+              <p><a href="#" onclick="vibrate(); return false;">Vibrate</a></p>
+          </div>
+          
+      </div>
+
+      
+  </body>
+</html>
