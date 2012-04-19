@@ -13,9 +13,7 @@ function onDeviceReady() {
 	destinationType=navigator.camera.DestinationType;
 	navigator.geolocation.getCurrentPosition(onSuccess, onError);
 }
-  
-  // Called when a photo is successfully retrieved
-  //
+
 function onPhotoDataSuccess(imageData) {
 	// Uncomment to view the base64 encoded image data
 	// console.log(imageData);
@@ -27,7 +25,7 @@ function onPhotoDataSuccess(imageData) {
 	// Unhide image elements
 	//
 	smallImage.style.display = 'block';
-	  
+	
 	// Show the captured photo
 	// The inline CSS rules are used to resize the image
 	//
@@ -59,14 +57,9 @@ function onPhotoURISuccess(imageURI) {
 //
 function capturePhoto() {
 	// Take picture using device camera and retrieve image as base64-encoded string
-	navigator.camera.getPicture(onPhotoDataSuccess, onFail, { quality: 50 });
-}
-  
-// A button will call this function
-//
-function capturePhotoEdit() {
-	// Take picture using device camera, allow edit, and retrieve image as base64-encoded string  
-	navigator.camera.getPicture(onPhotoDataSuccess, onFail, { quality: 20, allowEdit: true }); 
+	navigator.camera.getPicture(onPhotoDataSuccess, onFail, { quality: 50, 
+		destinationType: Camera.DestinationType.FILE_URI
+		});
 }
   
 // A button will call this function
@@ -77,9 +70,9 @@ function getPhoto(source) {
                                   destinationType: destinationType.FILE_URI,
                                   sourceType: source });
 }
-  
-// Called if something bad happens.
-// 
+
+//Called if something bad happens.
+//
 function onFail(message) {
 	alert('Failed because: ' + message);
 }
@@ -125,4 +118,13 @@ function playBeep() {
 //
 function vibrate() {
 	navigator.notification.vibrate(300);   
+}
+
+function prepareDB() {
+	var db = window.openDatabase("Gjenstander", "1.0", "Gjenstander", 1000000);
+}
+
+function populateDB(tx) {
+	tx.executeSQL('DROP TABLE IF EXISTS ITEMS');
+	tx.executeSQL('CREATE TABLE IF NOT EXISTS ITEMS (id, itemname, itemloc, )')
 }
