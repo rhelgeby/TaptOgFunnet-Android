@@ -126,5 +126,14 @@ function prepareDB() {
 
 function populateDB(tx) {
 	tx.executeSQL('DROP TABLE IF EXISTS ITEMS');
-	tx.executeSQL('CREATE TABLE IF NOT EXISTS ITEMS (id, itemname, itemloc, )')
+	tx.executeSQL('CREATE TABLE IF NOT EXISTS ITEMS (id INTEGER PRIMARY KEY AUTOINCREMENT ASC,
+						name TEXT,
+						loc TEXT,
+						pic TEXT,
+						desc TEXT,
+						phone double,
+						email TEXT,
+						alerttype TEXT,
+						loc TEXT,
+						time DATE)');
 }
