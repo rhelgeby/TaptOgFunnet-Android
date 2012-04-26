@@ -132,7 +132,7 @@ function buildItemTests()
 		function(testRunner)
 		{
 			var item = new DemoApp.Item();
-            var itemController = new DemoApp.ItemDBController();
+            var itemDBController = new DemoApp.ItemDBController();
             
             // Set minimum data.
             item.location = "Home";
