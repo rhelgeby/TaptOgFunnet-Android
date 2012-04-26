@@ -154,5 +154,24 @@ function buildItemTests()
 		}
 	]));
 	
+	itemTests.addTest(new TestCase("Get item from DB", "index.html",
+	[
+		function(testRunner)
+		{
+            var itemController = new DemoApp.ItemDBController();
+            var onSuccess = testRunner.createNoOpCallback();
+            
+            var onError = testRunner.createCallback(function(err)
+            {
+                throw err.message();
+            });
+            
+            itemDBController.getItem(0, onSuccess, onError);
+            
+            // Wait for callbacks.
+            return false;
+		}
+	]));
+	
 	return itemTests;
 }
