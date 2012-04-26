@@ -2,7 +2,7 @@ function initApp(){
 	document.addEventListener("deviceready", onDeviceReady, true);
 	
 	// Disable this if not testing.
-	//initTesting();
+	initTesting();
 }
 
 var pictureSource;   // picture source

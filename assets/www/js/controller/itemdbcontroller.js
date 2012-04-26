@@ -23,7 +23,9 @@ DemoApp.ItemDBController = function() {
  * @param onError   (Callback) Failed to add item. First parameter is a
  *                  SQLError object from PhoneGap.
  */
-DemoApp.ItemController.prototype.addItem = function(item, onSuccess, onError) {
+DemoApp.ItemDBController.prototype.addItem = function(item, onSuccess, onError) {
+	console.log("db addItem");
+	
 	this.db.transaction(createAndAdd, function(){}, onError);
 	
 	var createAndAdd = function(tx) {
@@ -60,6 +62,7 @@ DemoApp.ItemController.prototype.addItem = function(item, onSuccess, onError) {
  *                  SQLError object from PhoneGap.
  */
 DemoApp.ItemDBController.prototype.getItem = function(itemId, onSuccess, onError) {
+	console.log("db getItem");
 	var sql = "SELECT * FROM item WHERE id = " + itemId;
 	
 	var getData = function(tx) {

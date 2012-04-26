@@ -158,7 +158,7 @@ function buildItemTests()
 	[
 		function(testRunner)
 		{
-            var itemController = new DemoApp.ItemDBController();
+            var itemDBController = new DemoApp.ItemDBController();
             var onSuccess = testRunner.createNoOpCallback();
             
             var onError = testRunner.createCallback(function(err)

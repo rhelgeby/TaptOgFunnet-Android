@@ -46,7 +46,7 @@ DemoApp.ItemController.prototype.addItem = function(item, onSuccess, onError) {
  *                  -1 on invalid id
  *                  (todo: database errors)
  */
-DemoApp.ItemDBController.prototype.getItem = function(itemId, onSuccess, onError) {
+DemoApp.ItemController.prototype.getItem = function(itemId, onSuccess, onError) {
     // Not implemented.
     setTimeout(function()
     {
