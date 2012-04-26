@@ -1,7 +1,10 @@
-function onLoad(){              
+function initApp(){              
 	document.addEventListener("deviceready", onDeviceReady, true);
+	
+	// Disable this if not testing.
+	//initTesting();
 }
-   
+
 var pictureSource;   // picture source
 var destinationType; // sets the format of returned value 
   
@@ -126,14 +129,8 @@ function prepareDB() {
 
 function populateDB(tx) {
 	tx.executeSQL('DROP TABLE IF EXISTS ITEMS');
-	tx.executeSQL('CREATE TABLE IF NOT EXISTS ITEMS (id INTEGER PRIMARY KEY AUTOINCREMENT ASC,
-						name TEXT,
-						loc TEXT,
-						pic TEXT,
-						desc TEXT,
-						phone double,
-						email TEXT,
-						alerttype TEXT,
-						loc TEXT,
-						time DATE)');
+	tx.executeSQL("CREATE TABLE IF NOT EXISTS ITEMS (id INTEGER PRIMARY KEY AUTOINCREMENT ASC, " +
+						"name TEXT, loc TEXT, pic TEXT, desc TEXT, " +
+						"phone double, email TEXT, alerttype TEXT, " +
+						"lng TEXT, lat TEXT, time DATE)");
 }
