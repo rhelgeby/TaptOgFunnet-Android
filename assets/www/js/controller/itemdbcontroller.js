@@ -15,6 +15,29 @@ DemoApp.ItemDBController = function() {
 }
 
 /**
+ * Prepares a empty item table. If it doesn't exist it's created. If it's
+ * deleted first.
+ * 
+ * @param onSuccess	(Callback) Table was created successfully.
+ * @param onError	(Callback) Failed to create table.
+ */
+DemoApp.ItemDBController.prototype.prepareTable = function(onSuccess, onError) {
+
+	var sql = "CREATE TABLE IF NOT EXISTS 'item' ("
+		+ "'id' INTEGER PRIMARY KEY AUTOINCREMENT, 'name' TEXT, "
+		+ "'loc' TEXT, 'pic' TEXT, 'desc' TEXT, 'phone' TEXT, "
+		+ "'email' TEXT, 'notifyEmail' TEXT, 'notifySMS' TEXT, "
+		+ "'notifyAlert' TEXT, 'lng' REAL, 'lat' REAL, 'time' INTEGER)";
+	
+	var transaction = function(tx) {
+		tx.executeSql("DROP TABLE IF EXISTS 'item'");
+		tx.executeSql(sql);
+	}
+	
+	this.db.transaction(transaction, onError, onSuccess);
+}
+
+/**
  * Adds the specified item.
  *
  * @param item      Item object to add.
@@ -26,29 +49,23 @@ DemoApp.ItemDBController = function() {
 DemoApp.ItemDBController.prototype.addItem = function(item, onSuccess, onError) {
 	console.log("db addItem");
 	
-	this.db.transaction(createAndAdd, function(){}, onError);
-	
-	var createAndAdd = function(tx) {
-		tx.executeSQL("DROP TABLE IF EXISTS ITEM");
-		tx.executeSQL("CREATE TABLE IF NOT EXISTS ITEM (" +
-						"id INTEGER PRIMARY KEY AUTOINCREMENT ASC, name TEXT, " +
-						"loc TEXT, pic TEXT, desc TEXT, phone DOUBLE, " +
-						"email TEXT, notifyEmail TEXT, notifySMS TEXT, " +
-						"notifyAlert TEXT, lng TEXT, lat TEXT, time INTEGER)");
-		tx.executeSQL("INSERT INTO ITEM (name, loc, pic, desc, phone, " +
-						"email, notifyEmail, notifySMS, notifyAlert, lng, lat, time) " +
-						"VALUES (" + item.name + ", " + item.location + ", " +
-						item.imageURL + ", " + item.description + ", " + item.phone
-						+ ", " + item.email + ", " + item.notifyEmail + ", " + 
-						item.notifySMS + ", " + item.notifyAlert + ", " + item.longitude
-						+ ", " + item.latitude + ", " + item.timestamp + ")");
+	var transaction = function(tx) {
+		tx.executeSql("INSERT INTO 'item' ('name', 'loc', 'pic', 'desc', 'phone', 'email', 'notifyEmail', 'notifySMS', 'notifyAlert', 'lng', 'lat', 'time') "
+						+ "VALUES ('" + item.name + "', '" + item.location + "', '"
+						+ item.imageURL + "', '" + item.description + "', '"
+						+ item.phone + "', '" + item.email + "', '"
+						+ item.notifyEmail + "', '" + item.notifySMS + "', '"
+						+ item.notifyAlert + "', '" + item.longitude + "', '"
+						+ item.latitude + "', '" + item.timestamp + "')");
 	};
+	
+	this.db.transaction(transaction, onError, onSuccess);
 	
 	// koble til db (bruk onError, lag eget callback for onSuccess selv)
 	//
-	// bygg opp streng med spørring
-	// send spørring (i onsuccess)
-	// bruk onerror hvis spørring går galt
+	// bygg opp streng med spÃ¸rring
+	// send spÃ¸rring (i onsuccess)
+	// bruk onerror hvis spÃ¸rring gÃ¥r galt
 	
 }
 
@@ -63,22 +80,37 @@ DemoApp.ItemDBController.prototype.addItem = function(item, onSuccess, onError) 
  */
 DemoApp.ItemDBController.prototype.getItem = function(itemId, onSuccess, onError) {
 	console.log("db getItem");
-	var sql = "SELECT * FROM item WHERE id = " + itemId;
+	
+	// TODO: Handle error callbacks and pass DemoApp.ItemError objects as
+	//		 parameters.
+	
+	var _controller = this;
+	var querySuccess = function(tx, resultSet) {
+		console.log("db getItem success");
+		
+		// Check if not found.
+		if (resultSet.rows.length == 0) {
+			onError.apply(onError, [new DemoApp.ItemError(DemoApp.ItemError.INVALID_ID, "Invalid ID")]);
+			return;
+		}
+		
+    	// Fetch item.
+		var result = resultSet.rows.item(0);	// "item" is row item, not a DemoApp.Item.
+		console.log("db getItem result: " + result);
+		var item = _controller.fetchItem(result);
+		console.log("db getItem item:" + item);
+		
+		// Call success callback, pass item object as parameter.
+		onSuccess.apply(onSuccess, [item]);
+    }
 	
 	var getData = function(tx) {
+		var sql = "SELECT * FROM item WHERE id = " + itemId;
+		console.log("db getItem query: " + sql);
 		tx.executeSql(sql, [], querySuccess, onError);
 	}
 	
-	var querySuccess = function(tx, resultSet) {
-    	// Fetch item.
-		var result = resultSet.rows.item(0);
-		var item = this.fetchItem(result);
-		
-		// Call success callback, pass item object.
-		onSuccess(item);
-    }
-	
-	this.db.transaction(getData, function(){}, onError);
+	this.db.transaction(getData, onError, onSuccess);
 }
 
 /**
@@ -102,10 +134,17 @@ DemoApp.ItemController.prototype.list = function(location, onSuccess, onError) {
  * Fetches a item row into an Item object.
  * 
  * @param row		Object with item data attributes.
- * @returns 		Item object.
+ * @returns 		Item object, or null if row is undefined.
  */
-DemoApp.ItemController.prototype.fetchItem = function(row) {
-	var item = new Item();
+DemoApp.ItemDBController.prototype.fetchItem = function(row) {
+	// Simple validation.
+	if (typeof row == "undefined")
+	{
+		console.log("Warning: Attempting to fetch a item row from nothing.");
+		return null;
+	}
+	
+	var item = new DemoApp.Item();
 	item.location = row.loc;
 	
 	item.name = row.name;

@@ -7,7 +7,7 @@ function initTesting()
 			buildTests(),	// testSuite
 			true,			// alwaysStart
 			false,			// showResults
-			300);			// eventFallbackDelay
+			400);			// eventFallbackDelay
 			//10000);		// callbackTimeout (optional, defaults to 10 seconds.)
 }
 

@@ -28,7 +28,11 @@ DemoApp.ItemController = function() {
  *                  (todo: database errors)
  */
 DemoApp.ItemController.prototype.addItem = function(item, onSuccess, onError) {
-    // Not implemented.
+    console.log("addItem");
+	
+	// TODO: Sanitize user input.
+	
+	// Not implemented.
     setTimeout(function()
     {
         onError(new DemoApp.ItemError(-100, "Not implemented"));

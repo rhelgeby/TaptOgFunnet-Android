@@ -191,7 +191,8 @@ function assertArrayNotEmpty(actual, msg) {
 /**
  * Constructs a iterator state object.
  * 
- * This object holds the index of the next element and is suitable for serialization.
+ * This object holds the index of the next element and is suitable for
+ * serialization.
  * 
  * @param nextElement		Index of next element.
  * 
@@ -221,7 +222,7 @@ function ElementIterator(elements, state)
 }
 
 /**
- * Returns the next element.
+ * Returns the next element and updates the cursor position to the next element.
  * 
  * @returns		Next element or null if no more elements.
  */
@@ -238,7 +239,8 @@ ElementIterator.prototype.next = function()
 }
 
 /**
- * Gets the next element without updating the iterator cursor to the next element.
+ * Gets the next element without updating the iterator cursor to the next
+ * element.
  * 
  * @returns		Next element or null if no more elements.
  */
@@ -253,7 +255,8 @@ ElementIterator.prototype.peek = function()
 }
 
 /**
- * Gets the previous element retrieved, if any. Does not update the iterator cursor.
+ * Gets the previous element retrieved, if any. Does not update the iterator
+ * cursor.
  * 
  * @returns		Last element or null if none previously retrieved.
  */
@@ -404,6 +407,7 @@ TestCollection.prototype.validateTestCase = function(testCase)
 {
 	if (!(testCase instanceof TestCase))
 	{
+		// TODO: Bug: where is "i"?
 		throw "Invalid test case at index " + i + ". Must be a TestCase object.";
 	}
 }
@@ -843,8 +847,8 @@ TestRunner.prototype.runTest = function(testCase)
 	// Loop through phases, starting from current phase.
 	while (!testCase.failed && typeof testCase.phases[this.currentPhase] === "function")
 	{
-		// Number of callbacks used in this phase. (Note: This var is declared/reset here.)
-		this.numCallbacks = 0;
+		// Whether this phase is waiting for a callback. (Note: This var is declared/reset here.)
+		this.waitingForCallback = false;
 		
 		try
 		{
@@ -879,17 +883,18 @@ TestRunner.prototype.runTest = function(testCase)
 	
 	if (abortScript)
 	{
-		// Check if waiting for callbacks.
-		if (this.numCallbacks > 0)
+		// Check if waiting for a callback.
+		if (this.waitingForCallback)
 		{
 			// Create callback fail-handler that will resume script if callback wasn't called.
 			var _testRunner = this;
 			var handler = function()
 			{
-				console.log("No callbacks called. Resuming testing.");
+				console.log("Timed out while waiting for callbacks. Resuming testing.");
 				
 				// Fail test.
 				_testRunner.failTest(testCase, "No callbacks called.");
+				_testRunner.waitingForCallback = false;
 				
 				// Resume test runner.
 				_testRunner.run();
@@ -964,18 +969,25 @@ TestRunner.prototype.failTest = function(testCase, msg)
  */
 TestRunner.prototype.createCallback = function(callback)
 {
-	this.numCallbacks++;
+	this.waitingForCallback = true;
 	var _testRunner = this;
 	
 	// TODO: support for multiple calls to the same callback.
 	
 	var handler = function()
 	{
-		_testRunner.numCallbacks--;
+	    var test = _testRunner.currentTest;
+	    
+		if (!_testRunner.waitingForCallback)
+		{
+		    console.log("Warning: Unexpected callback in test '" + test.name + "'");
+		    return;
+		};
 		
-		// Stop fail-timer
+		// Stop fail-timer and reset states.
 		clearTimeout(_testRunner.callbackFailTimer);
 		_testRunner.callbackFailTimer = null;
+		_testRunner.waitingForCallback = false;
 		
 		// Call function.
 		try
@@ -985,7 +997,7 @@ TestRunner.prototype.createCallback = function(callback)
 		catch (err)
 		{
 			// Handles assertions and other exceptions.
-			_testRunner.handleError(_testRunner.currentTest, err);
+			_testRunner.handleError(test, err);
 		}
 		
 		// Resume testing (proceed to next phase or test.)
@@ -1007,19 +1019,27 @@ TestRunner.prototype.createCallback = function(callback)
  */
 TestRunner.prototype.createErrorCallback = function(msg)
 {
-	this.numCallbacks++;
+	this.waitingForCallback = true;
 	var _testRunner = this;
 	var _msg = msg;
 	
 	var handler = function()
 	{
-		_testRunner.numCallbacks--;
+		var test = _testRunner.currentTest;
+	    
+		if (!_testRunner.waitingForCallback)
+		{
+		    console.log("Warning: Unexpected callback (error) in test '" + test.name + "'");
+		    return;
+		};
 		
-		// Stop fail-timer
+		// Stop fail-timer and reset states.
 		clearTimeout(_testRunner.callbackFailTimer);
+		_testRunner.callbackFailTimer = null;
+		_testRunner.waitingForCallback = false;
 		
 		// Fail test.
-		_testRunner.failTest(_testRunner.currentTest, _msg);
+		_testRunner.failTest(test, _msg);
 		
 		// Resume testing (proceed to next phase or test.)
 		_testRunner.run();
@@ -1036,15 +1056,23 @@ TestRunner.prototype.createErrorCallback = function(msg)
  */
 TestRunner.prototype.createNoOpCallback = function()
 {
-	this.numCallbacks++;
+	this.waitingForCallback = true;
 	var _testRunner = this;
 	
 	var handler = function()
 	{
-		_testRunner.numCallbacks--;
+		var test = _testRunner.currentTest;
+	    
+		if (!_testRunner.waitingForCallback)
+		{
+		    console.log("Warning: Unexpected callback (no-op) in test '" + test.name + "'");
+		    return;
+		};
 		
 		// Stop fail-timer
 		clearTimeout(_testRunner.callbackFailTimer);
+		_testRunner.callbackFailTimer = null;
+		_testRunner.waitingForCallback = false;
 		
 		// Resume testing (proceed to next phase or test.)
 		_testRunner.run();
@@ -1147,7 +1175,7 @@ TestRunner.prototype.buildResults = function()
 // Richard Helgeby
 
 /**
- * Initializes tests and and starts Test Runner.
+ * Initializes and starts TestRunner.
  * 
  * @param testSuite		Test suite to use (TestSuite object).
  * @param alwaysStart	Whether testing should always start (true), or just if
@@ -1189,7 +1217,7 @@ function TestRunnerStarter(testSuite, alwaysStart, showResults, eventFallbackDel
 	// deviceready event).
 	if (!this.isPhoneGapAvailable())
 	{
-		this.run();
+		this.run(this.alwaysStart);
 	}
 	else
 	{
@@ -1197,7 +1225,7 @@ function TestRunnerStarter(testSuite, alwaysStart, showResults, eventFallbackDel
 		// is loaded, this happens sometimes).
 		if (this.isPhoneGapReady())
 		{
-			this.run();
+			this.run(this.alwaysStart);
 		}
 		else
 		{
@@ -1248,7 +1276,7 @@ TestRunnerStarter.prototype.onDeviceReady = function()
 	if (!this.deviceReadyFired)
 	{
 		this.deviceReadyFired = true;
-		this.run();
+		this.run(this.alwaysStart);
 	}
 }
 
@@ -1266,7 +1294,7 @@ TestRunnerStarter.prototype.eventFallback = function()
 		// just delayed.
 		this.deviceReadyFired = true;
 		
-		this.run();
+		this.run(this.alwaysStart);
 	}
 }
 
@@ -1276,13 +1304,16 @@ TestRunnerStarter.prototype.eventFallback = function()
 TestRunnerStarter.prototype.prepareRunner = function()
 {
 	this.runner = new TestRunner(this.testSuite, "test_results.html", this.callbackTimeout);
-	console.log("TestRunner ready on page " + window.location.href);
+	//console.log("TestRunner ready on page " + window.location.href);
 }
 
 /**
- * Starts testing.
+ * Starts the test runner. This is called by the constructor by default.
+ * 
+ * @param alwaysStart	Whether testing should always start. Passing false will
+ * 						only start the test runner if a test session is active.
  */
-TestRunnerStarter.prototype.run = function()
+TestRunnerStarter.prototype.run = function(alwaysStart)
 {
     // Display results if testing is done.
 	if (this.displayResults)
@@ -1292,7 +1323,7 @@ TestRunnerStarter.prototype.run = function()
 	}
 	else
 	{
-		if (this.alwaysStart)
+		if (alwaysStart)
 		{
 			// Always start.
 			this.runner.run();

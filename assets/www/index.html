@@ -7,7 +7,8 @@
       <link rel="stylesheet" href="css/jquery.mobile-1.0.1.css" />
       <script src="js/jquery.js"></script>
       <script src="js/jquery.mobile-1.0.1.js"></script>
-      <script type="text/javascript" charset="utf-8" src="js/cordova-1.6.0.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/cordova-1.6.0.android.js"></script>
+      <script type="text/javascript" charset="utf-8" src="js/cordova-1.6.0.iOS.js"></script>
       <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
       
       <script type="text/javascript" charset="utf-8" src="js/model/item.js"></script>
@@ -17,6 +18,13 @@
       <script type="text/javascript" charset="utf-8" src="js/test/testrunner-1.0.0.js"></script>
       <script type="text/javascript" charset="utf-8" src="js/test/test_main.js"></script>
       <script type="text/javascript" charset="utf-8" src="js/test/test_item.js"></script>
+      <script>  
+          // Global declarations  
+          var item = null;  
+          var email = null;          
+          var form1var = null;
+
+      </script>  
   </head>
 
   <body onload="initApp();">
@@ -113,10 +121,10 @@
           <div data-role="header">
               <h1>Funnet gjenstand</h1>
           </div>
-          
           <div data-role="content">
-            <label for="select-choice-1" class="select">Hvor ble gjenstanden funnet?</label>
-            <select name="select-choice-1" id="select-choice-1">
+            <form id="form1">
+            <label Id="areaLabel" for="area" class="select">Hvor ble gjenstanden funnet?</label>
+            <select name="area_r" id="area" tabIndex="2">
                 <option value="oslo">Oslo</option>
                 <option value="vestfold">Vestfold</option>
                 <option value="buskerud">Buskerud</option>
@@ -138,28 +146,39 @@
                 <option value="hordaland">Hordaland</option>
             </select><br>
               
-            <input type="text" name="txt" id="txtarea" value="Navn på gjenstanden" /><br>
-
+            <div id="item" data-role="fieldcontain">
+                <label id="itemlabel" for="item">Gjenstand</label>		
+                <input id="item" name="item_r" type="text" />
+            </div>
+            
             <button onclick="capturePhoto();">Ta et bilde av gjenstanden</button> <br>
             <img style="display:none;width:60px;height:60px;" id="smallImage" src="" /><br>
               
-            <textarea cols="40" rows="8" name="textarea" id="textarea">Beskrivelse av gjenstanden, og hvor den ble funnet.</textarea><br>
-              
-            <input type="text" name="txt" id="txtarea" value="Ditt telefonnummer" />
-            <input type="text" name="txt" id="txtarea" value="Ditt mobilnummer" />
-            <input type="text" name="txt" id="txtarea" value="Din e-mail" /><br>
-              
-            <fieldset data-role="controlgroup">
-                <legend>Huk av for de måtene du vil bli kontaktet på:</legend>
-                <input type="checkbox" name="checkbox-1" id="checkbox-1" class="custom" />
-                <input type="checkbox" name="checkbox-2" id="checkbox-2" class="custom" />
-                <input type="checkbox" name="checkbox-3" id="checkbox-3" class="custom" />
-                <label for="checkbox-1">E-mail</label>
-                <label for="checkbox-2">SMS</label>
-                <label for="checkbox-3">Telefon</label>
-            </fieldset>
+            <div id="desc" data-role="fieldcontain">
+                <label id="descLabel" for="desc">Beskriv gjenstanden</label>
+                <textarea cols="40" rows="8" id="desc" name="desc"></textarea>
+            </div>
+            
+            <div id="homePhone" data-role="fieldcontain">
+                <label for="homePhoneLabel">Hjemtelefon</label>		
+                <input id="homePhone" name="homePhone" type="text" />
+            </div>
+                
+            <div id="mobilePhone" data-role="fieldcontain">
+                <label for="mobilePhoneLabel">Mobiltelefon</label>		
+                <input id="mobilePhone" name="mobilePhone" type="text" />
+            </div>
+            
+            <div id="email" data-role="fieldcontain">
+                <label for="emailLabel">Email</label>		
+                <input id="email" name="email_r" type="text" />
+            </div>
               
             <p id="geolocation">Finding geolocation...</p>
+            <div id="submitDiv" data-role="fieldcontain">    
+                <input type="submit" value="Submit Claim" data-inline="true"/>
+            </div>
+            </form>
               
           </div>
     </div>
@@ -178,6 +197,30 @@
           
       </div>
 
+      <script>
+          
+          $(document).ready(function() {
+                            // Assign global variables
+                            itemLabelVar = $('#itemLabel');
+                            item = $('#item');
+                            emailLabelVar = $('#emailLabel');
+                            email = $('#email');
+                            form1Var = $('#form1');
+
+                            }); 
+          
+          $('#buttonOK').click(function() {
+                               hideContentDialog();
+                               showMain();
+                               return false;      
+                               });
+          
+          
+          $('#form1').submit(function() {
+                             console.log("Dette ble registrert" + item + email);
+                             });    
+          
+          </script>
       
   </body>
 </html>

@@ -110,7 +110,7 @@ function showAlert() {
             'Er det ditt?'       // buttonName
 	);
 }
-  
+
 // Beep three times
 //
 function playBeep() {
